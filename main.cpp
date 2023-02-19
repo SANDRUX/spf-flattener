@@ -132,9 +132,9 @@ void flatten(const std::string & domain, std::vector<std::string> & address)
 
         char * ptr = NULL;
 
-        if ((ptr = std::strstr(dispbuf, "spf")) != NULL)
+        if ((ptr = std::strstr(dispbuf, "v=spf")) != NULL)
         {
-            ptr += 5;
+            ptr += 7;
 
             while (*ptr != '"')
             {
@@ -154,9 +154,13 @@ void flatten(const std::string & domain, std::vector<std::string> & address)
         {
             address.push_back(record[i].address);
         }
-        else if(record[i].mechanism == Mechanism::ip6)
+        else if (record[i].mechanism == Mechanism::ip6)
         {
             address.push_back(record[i].address);
+        }
+        else if(record[i].mechanism == Mechanism::redirect || record[i].mechanism == Mechanism::include)
+        {
+            flatten(record[i].address, address);
         }
     }
 }
