@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 9.0.1, 2023-02-27T22:54:51. -->
+<!-- Written by QtCreator 9.0.1, 2023-03-22T23:31:33. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -381,11 +381,13 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">spf</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.spf</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">spf</value>
+    <value type="QString" key="RunConfiguration.Arguments">optime.dev</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseTerminal">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/sandrux/build-spf-Desktop_Qt_6_4_2_GCC_64bit-Debug</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>

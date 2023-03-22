@@ -154,6 +154,9 @@ void flatten(const std::string & domain, std::vector<std::string> & address)
             }      
         }
     }
+
+    std::cout << resolve_output;
+
     std::vector <parsedRecord> record;
 
     parse_txt_record(resolve_output, record);
@@ -166,20 +169,65 @@ void flatten(const std::string & domain, std::vector<std::string> & address)
         }
         else
         {
-            address.push_back(record[i].address);
+            std::string recording;
+
+            switch (record[i].mechanism)
+            {
+                case Mechanism::ip4:
+                    recording += "ip4:";
+                    break;
+
+                case Mechanism::ip6:
+                    recording += "ip6:";
+                    break;
+
+                case Mechanism::a:
+                    recording += "a:";
+                    break;
+
+                case Mechanism::mx:
+                    recording += "mx:";
+                    break;
+
+                case Mechanism::ptr:
+                    recording += "ptr:";
+                    break;
+
+                case Mechanism::exists:
+                    recording += "exists:";
+                    break;
+
+                case Mechanism::exp:
+                    recording += "exp=";
+                    break;
+            }
+
+            recording += record[i].address;
+
+            address.push_back(recording);
         }
     }
 }
 
-int main()
+int main(int argc, char ** argv)
 {
+    int size = 0;
+
     std::vector <std::string> output;
-    flatten("gmail.com", output);
+
+    flatten(std::string(argv[1]), output);
+
+    std::cout << std::endl << std::endl;
 
     for (int i = 0; i < output.size(); i++)
     {
         std::cout << output[i] << std::endl;
+        size += output[i].size();
     }
+
+    std::cout << std::endl << std::endl;
+
+    std::cout << size;
 
     return 0;
 }
