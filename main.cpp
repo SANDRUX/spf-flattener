@@ -25,7 +25,7 @@ struct parsedRecord
 {
     std::string address;
     Mechanism mechanism;
-    char all;
+//    char all;
 };
 
 void parse_txt_record(const std::string & record, std::vector<parsedRecord> & parsed)
@@ -40,37 +40,37 @@ void parse_txt_record(const std::string & record, std::vector<parsedRecord> & pa
         ptr = std::strtok(NULL, " ");
     }
 
-    char all;
+//    char all;
 
-    for (int i = 0; i < temporary.size(); i++)
-    {
-        if (temporary[i].find("all") != std::string::npos)
-        {
-            all = temporary[i][0];
-        }
-    }
+//    for (int i = 0; i < temporary.size(); i++)
+//    {
+//        if (temporary[i].find("all") != std::string::npos)
+//        {
+//            all = temporary[i][0];
+//        }
+//    }
 
     for (int i = 0; i < temporary.size(); i++)
     {
         if (temporary[i].find("ip4") != std::string::npos)
         {
-            parsed.push_back({std::string(temporary[i].c_str() + 4), Mechanism::ip4, all});
+            parsed.push_back({std::string(temporary[i].c_str() + 4), Mechanism::ip4});
         }
 
         else if (temporary[i].find("ip6") != std::string::npos)
         {
-            parsed.push_back({std::string(temporary[i].c_str() + 4), Mechanism::ip6, all});
+            parsed.push_back({std::string(temporary[i].c_str() + 4), Mechanism::ip6});
         }
 
         else if (temporary[i][0] == 'a')
         {
             if (temporary[i].size() == 1)
             {
-                parsed.push_back({std::string(" "), Mechanism::a, all});
+                parsed.push_back({std::string(" "), Mechanism::a});
             }
             else
             {
-                parsed.push_back({std::string(temporary[i].c_str() + 2), Mechanism::a, all});
+                parsed.push_back({std::string(temporary[i].c_str() + 2), Mechanism::a});
             }
         }
 
@@ -78,11 +78,11 @@ void parse_txt_record(const std::string & record, std::vector<parsedRecord> & pa
         {
             if (temporary[i].size() == 2)
             {
-                parsed.push_back({std::string(" "), Mechanism::mx, all});
+                parsed.push_back({std::string(" "), Mechanism::mx});
             }
             else
             {
-                parsed.push_back({std::string(temporary[i].c_str() + 3), Mechanism::mx, all});
+                parsed.push_back({std::string(temporary[i].c_str() + 3), Mechanism::mx});
             }
         }
 
@@ -90,17 +90,17 @@ void parse_txt_record(const std::string & record, std::vector<parsedRecord> & pa
         {
             if (temporary[i].size() == 3)
             {
-                parsed.push_back({std::string(" "), Mechanism::ptr, all});
+                parsed.push_back({std::string(" "), Mechanism::ptr});
             }
             else
             {
-                parsed.push_back({std::string(temporary[i].c_str() + 4), Mechanism::ptr, all});
+                parsed.push_back({std::string(temporary[i].c_str() + 4), Mechanism::ptr});
             }
         }
 
         else if (temporary[i].find("exists") != std::string::npos)
         {
-            parsed.push_back({std::string(temporary[i].c_str() + 7), Mechanism::exists, all});
+            parsed.push_back({std::string(temporary[i].c_str() + 7), Mechanism::exists});
         }
 
         else if (temporary[i].find("include") != std::string::npos)
@@ -115,7 +115,7 @@ void parse_txt_record(const std::string & record, std::vector<parsedRecord> & pa
 
         else if (temporary[i].find("exp") != std::string::npos)
         {
-            parsed.push_back({std::string(temporary[i].c_str() + 4), Mechanism::exp, all});
+            parsed.push_back({std::string(temporary[i].c_str() + 4), Mechanism::exp});
         }
     }
 }
@@ -147,15 +147,18 @@ void flatten(const std::string & domain, std::vector<std::string> & address)
         {
             ptr += 7;
 
-            while (*ptr != '"')
+            char * end = std::strstr(dispbuf, "all");
+
+            while (ptr < end - 1)
             {
-                resolve_output += *ptr;
+                if (*ptr != '"')
+                {
+                    resolve_output += *ptr;
+                }
                 ptr++;
-            }      
+            }
         }
     }
-
-    std::cout << resolve_output;
 
     std::vector <parsedRecord> record;
 
@@ -165,7 +168,7 @@ void flatten(const std::string & domain, std::vector<std::string> & address)
     {
         if(record[i].mechanism == Mechanism::redirect || record[i].mechanism == Mechanism::include)
         {
-            flatten(record[i].address, address);
+            flatten(record[i].address, address);            
         }
         else
         {
@@ -211,6 +214,12 @@ void flatten(const std::string & domain, std::vector<std::string> & address)
 
 int main(int argc, char ** argv)
 {
+    if (argc != 2)
+    {
+        std::cerr << "spf: missing argument\n Try: spf <domain>";
+        return 0;
+    }
+
     int size = 0;
 
     std::vector <std::string> output;
@@ -219,15 +228,25 @@ int main(int argc, char ** argv)
 
     std::cout << std::endl << std::endl;
 
+    std::string resolved_spf = "v=spf1 ";
+
     for (int i = 0; i < output.size(); i++)
     {
-        std::cout << output[i] << std::endl;
-        size += output[i].size();
+        if (size + output[i].size() > 255)
+        {
+            resolved_spf += "\b\" \"";
+            size = 0;
+        }
+        else
+        {
+            resolved_spf += output[i] += " ";
+        }
+        size += output[i].size();        
     }
 
-    std::cout << std::endl << std::endl;
+    resolved_spf += "~all\"";
 
-    std::cout << size;
+    std::cout << resolved_spf;
 
     return 0;
 }
